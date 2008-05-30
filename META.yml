@@ -1,17 +1,22 @@
 ---
 name: URI-FromHash
-version: 0.02
+version: 0.03
 author:
   - 'Dave Rolsky, <autarch@urth.org>'
-abstract: The fantastic new URI::FromHash!
+abstract: Build a URI from a set of named parameters
 license: perl
 resources:
   license: http://dev.perl.org/licenses/
 requires:
-  Test::More: 0
+  Params::Validate: 0
   URI: 1.22
+build_requires:
+  Test::More: 0
 provides:
   URI::FromHash:
     file: lib/URI/FromHash.pm
-    version: 0.02
-generated_by: Module::Build version 0.2703
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

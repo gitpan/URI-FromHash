@@ -1,15 +1,15 @@
 NAME
-    URI::FromHash - The fantastic new URI::FromHash!
+    URI::FromHash - Build a URI from a set of named parameters
 
 SYNOPSIS
-    Perhaps a little code snippet.
+      use URI::FromHash qw( uri );
 
-      use URI::FromHash;
-
-      my $foo = URI::FromHash->new;
+      my $uri = uri( path  => '/some/path',
+                     query => { foo => 1, bar => 2 },
+                   );
 
 DESCRIPTION
-    This module provides a simple functional "named parameters" style
+    This module provides a simple one-subroutine "named parameters" style
     interface for creating URIs. Underneath the hood it uses "URI.pm",
     though because of the simplified interface it may not support all
     possible options for all types of URIs.
@@ -25,40 +25,59 @@ FUNCTIONS
     This module provides two functions both of which are *optionally*
     exportable:
 
-    * uri( ... )
-    * uri_object( ... )
-        Both of these functions accept the same set of parameters, except
-        for one additional parameter allowed when calling "uri()".
+  uri( ... ) and uri_object( ... )
+    Both of these functions accept the same set of parameters, except for
+    one additional parameter allowed when calling "uri()".
 
-        The "uri()" function simply returns a string representing a
-        canonicalized URI based on the provided parameters. The
-        "uri_object()" function returns new a "URI.pm" object based on the
-        given parameters.
+    The "uri()" function simply returns a string representing a
+    canonicalized URI based on the provided parameters. The "uri_object()"
+    function returns new a "URI.pm" object based on the given parameters.
 
-        These parameters are:
+    These parameters are:
 
-        o scheme
-                The URI's scheme. This is optional, and if none is given you
-                will create a schemeless URI. This is useful if you want to
-                create a URI to a path on the same server (as is commonly
-                done in "<a>" tags).
+    *   scheme
 
-        o host
-        o port
-        o path
-        o username
-        o password
-        o fragment
-                All of these are optional strings which can be used to
-                specify that part of the URI.
+        The URI's scheme. This is optional, and if none is given you will
+        create a schemeless URI. This is useful if you want to create a URI
+        to a path on the same server (as is commonly done in "<a>" tags).
 
-        o query This should be a hash reference of query parameters. The
-                values for each key may be a scalar or array reference. Use
-                an array reference to provide multiple values for one key.
+    *   host
 
-        o query_separator
-                This option is can *only* be provided when calling "uri()".
-                By default, it is a semi-colon (;).
+    *   port
+
+    *   path
+
+        The path can be either a string or an array reference.
+
+        If an array reference is passed each *defined* member of the array
+        will be joined by a single forward slash (/).
+
+        If you are building a host-less URI and want to include a leading
+        slash then make the first element of the array reference an empty
+        string ('').
+
+        You can add a trailing slash by making the last element of the array
+        reference an empty string.
+
+    *   username
+
+    *   password
+
+    *   fragment
+
+        All of these are optional strings which can be used to specify that
+        part of the URI.
+
+    *   query
+
+        This should be a hash reference of query parameters. The values for
+        each key may be a scalar or array reference. Use an array reference
+        to provide multiple values for one key.
+
+    *   query_separator
+
+        This option is can *only* be provided when calling "uri()". By
+        default, it is a semi-colon (;).
 
 AUTHOR
     Dave Rolsky, <autarch@urth.org>
@@ -70,8 +89,15 @@ BUGS
     be notified of progress on your bug as I make changes.
 
 COPYRIGHT & LICENSE
-    Copyright 2006 Dave Rolsky, All Rights Reserved.
+    Copyright 2006-2008 Dave Rolsky, All Rights Reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 226:
+        =back without =over
 

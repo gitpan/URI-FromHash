@@ -7,10 +7,10 @@ use base 'Exporter';
 
 use vars qw( $VERSION @EXPORT_OK );
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 @EXPORT_OK = qw( uri uri_object );
 
-use Params::Validate qw( validate SCALAR HASHREF );
+use Params::Validate qw( validate SCALAR ARRAYREF HASHREF );
 
 use URI;
 use URI::QueryParam;
@@ -22,7 +22,7 @@ my %BaseParams =
       password => { type => SCALAR, default  => '' },
       host     => { type => SCALAR, optional => 1 },
       port     => { type => SCALAR, optional => 1 },
-      path     => { type => SCALAR, optional => 1 },
+      path     => { type => SCALAR | ARRAYREF, optional => 1 },
       query    => { type => HASHREF, default => {} },
       fragment => { type => SCALAR,  optional => 1 },
     );
@@ -52,13 +52,23 @@ sub uri_object
         }
     }
 
-    $uri->host( $p{host} )
-        if grep { defined && length } $p{host};
-    $uri->port( $p{port} )
-        if grep { defined && length } $p{port};
+    for my $k ( qw( host port ) )
+    {
+        $uri->$k( $p{$k} )
+            if grep { defined && length } $p{$k};
+    }
 
-    $uri->path( $p{path} )
-        if grep { defined && length } $p{path};
+    if ( $p{path} )
+    {
+        if ( ref $p{path} )
+        {
+            $uri->path( join '/', grep { defined } @{ $p{path} } );
+        }
+        else
+        {
+            $uri->path( $p{path} );
+        }
+    }
 
     while ( my ( $k, $v ) = each %{ $p{query} } )
     {
@@ -66,7 +76,7 @@ sub uri_object
     }
 
     $uri->fragment( $p{fragment} )
-        if grep { defined && length } $p{fragment} ;
+        if grep { defined && length } $p{fragment};
 
     return $uri;
 }
@@ -98,19 +108,23 @@ sub _check_required
 {
     my $p = shift;
 
-    unless ( ( grep { defined and length }
-               map { $p->{$_} }
-               qw( host path fragment )
-             )
-             ||
-             keys %{ $p->{query} }
-           )
-    {
-        require Carp;
-        local $Carp::CarpLevel = 1;
-        Carp::croak( 'None of the required parameters '
-                     . '(host, path, fragment, or query) were given' );
-    }
+    return if
+        ( grep { defined and length }
+          map { $p->{$_} }
+          qw( host fragment )
+        );
+
+    return if
+        ref $p->{path}
+        ? @{ $p->{path} }
+        : defined $p->{path} && length $p->{path};
+
+    return if keys %{ $p->{query} };
+
+    require Carp;
+    local $Carp::CarpLevel = 1;
+    Carp::croak( 'None of the required parameters '
+                 . '(host, path, fragment, or query) were given' );
 }
 
 
@@ -120,19 +134,19 @@ __END__
 
 =head1 NAME
 
-URI::FromHash - The fantastic new URI::FromHash!
+URI::FromHash - Build a URI from a set of named parameters
 
 =head1 SYNOPSIS
 
-Perhaps a little code snippet.
+  use URI::FromHash qw( uri );
 
-  use URI::FromHash;
-
-  my $foo = URI::FromHash->new;
+  my $uri = uri( path  => '/some/path',
+                 query => { foo => 1, bar => 2 },
+               );
 
 =head1 DESCRIPTION
 
-This module provides a simple functional "named parameters" style
+This module provides a simple one-subroutine "named parameters" style
 interface for creating URIs. Underneath the hood it uses C<URI.pm>,
 though because of the simplified interface it may not support all
 possible options for all types of URIs.
@@ -149,11 +163,7 @@ such as Mason or TT2.
 This module provides two functions both of which are I<optionally>
 exportable:
 
-=over 4
-
-=item * uri( ... )
-
-=item * uri_object( ... )
+=head2 uri( ... ) and uri_object( ... )
 
 Both of these functions accept the same set of parameters, except for
 one additional parameter allowed when calling C<uri()>.
@@ -165,36 +175,48 @@ given parameters.
 
 These parameters are:
 
-=over 8
+=over 4
 
-=item o scheme
+=item * scheme
 
 The URI's scheme. This is optional, and if none is given you will
 create a schemeless URI. This is useful if you want to create a URI to
 a path on the same server (as is commonly done in C<< <a> >> tags).
 
-=item o host
+=item * host
 
-=item o port
+=item * port
 
-=item o path
+=item * path
 
-=item o username
+The path can be either a string or an array reference.
 
-=item o password
+If an array reference is passed each I<defined> member of the array
+will be joined by a single forward slash (/).
 
-=item o fragment
+If you are building a host-less URI and want to include a leading
+slash then make the first element of the array reference an empty
+string (C<''>).
+
+You can add a trailing slash by making the last element of the array
+reference an empty string.
+
+=item * username
+
+=item * password
+
+=item * fragment
 
 All of these are optional strings which can be used to specify that
 part of the URI.
 
-=item o query
+=item * query
 
 This should be a hash reference of query parameters. The values for
 each key may be a scalar or array reference. Use an array reference to
 provide multiple values for one key.
 
-=item o query_separator
+=item * query_separator
 
 This option is can I<only> be provided when calling C<uri()>. By
 default, it is a semi-colon (;).
@@ -216,7 +238,7 @@ notified of progress on your bug as I make changes.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Dave Rolsky, All Rights Reserved.
+Copyright 2006-2008 Dave Rolsky, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
