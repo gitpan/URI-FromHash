@@ -1,12 +1,20 @@
-Build.PL
 Changes
-lib/URI/FromHash.pm
+INSTALL
 LICENSE
-Makefile.PL
-MANIFEST			This list of files
+MANIFEST
+META.json
 META.yml
+Makefile.PL
 README
-t/pod-coverage.t
-t/pod.t
+dist.ini
+lib/URI/FromHash.pm
+t/00-compile.t
+t/author-pod-spell.t
+t/release-cpan-changes.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-linkcheck.t
+t/release-pod-no404s.t
+t/release-pod-syntax.t
 t/uri.t
-SIGNATURE    Added here by Module::Build

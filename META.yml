@@ -1,22 +1,31 @@
 ---
-name: URI-FromHash
-version: 0.03
+abstract: 'Build a URI from a set of named parameters'
 author:
-  - 'Dave Rolsky, <autarch@urth.org>'
-abstract: Build a URI from a set of named parameters
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Params::Validate: 0
-  URI: 1.22
+  - 'Dave Rolsky <autarch@urth.org>'
 build_requires:
-  Test::More: 0
-provides:
-  URI::FromHash:
-    file: lib/URI/FromHash.pm
-    version: 0.03
-generated_by: Module::Build version 0.2808
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-FromHash
+requires:
+  Carp: 0
+  Exporter: 0
+  Params::Validate: 0
+  URI: 0
+  URI::QueryParam: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=URI-FromHash
+  homepage: http://metacpan.org/release/URI-FromHash
+  repository: git://git.urth.org/URI-FromHash.git
+version: 0.04
+x_authority: cpan:DROLSKY
